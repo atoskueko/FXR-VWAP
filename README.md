@@ -82,6 +82,15 @@ CODING NOTES
 Anchor line: OBJ_VLINE named FXR_VWAP_Anchor, OBJPROP_SELECTABLE true; OnChartEvent drag → snap to bar, full recompute
 
 ------------------------------------------------
+Limitations & known issues
+------------------------------------------------
+- Tick volume ≠ traded volume. On forex/CFDs the VWAP is a tick-volume-weighted average; it tracks exchange VWAP closely on liquid pairs but is not the same number. Real volume is used only where the broker publishes it (some futures/stock CFDs).
+- Session reset is in server time; brokers differ (GMT+2/+3 with DST). Set SessionStart per broker.
+- Values differ slightly from TradingView when the TV session boundary differs from your broker's day or when TV uses real volume.
+- Not a signal generator; the cross alert is informational.
+- No MT4 build yet.
+
+------------------------------------------------
 MIT LICENCE
 ------------------------------------------------
 MIT License
