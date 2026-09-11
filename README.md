@@ -98,7 +98,7 @@ MIT LICENCE
 ------------------------------------------------
 MIT License
 
-Copyright (c) 2026 FXrepo.com
+Copyright (c) 2026 FXrepo.com (atoskueko); About → website https://fxrepo.com/resources/vwap-indicator-mt5/, topics mql5 metatrader5 vwap indicator.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
