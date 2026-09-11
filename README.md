@@ -8,6 +8,9 @@ Closest third-party alternative: TradingView's built-in VWAP (session/anchored w
 Post URL: https://fxrepo.com/resources/vwap-indicator-mt5/
 Licence: MIT (see below)
 
+<img width="1358" height="643" alt="FXR VWAP-1" src="https://github.com/user-attachments/assets/baefe113-917d-4685-aa33-f95d255dad7a" />
+
+
 ------------------------------------------------
 INSTALLATION
 ------------------------------------------------
