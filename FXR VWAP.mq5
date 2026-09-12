@@ -6,7 +6,7 @@
 #property copyright "Copyright 2026, FXrepo.com"
 #property link "https://fxrepo.com/resources/vwap-indicator-mt5/"
 #property description "FXR VWAP — session / weekly / monthly / anchored VWAP with volume-weighted bands. MIT licence."
-#property version   "1.00"
+#property version   "1.0.1"
 
 #property indicator_chart_window
 #property indicator_buffers 5
@@ -261,28 +261,17 @@ void EnsureAnchorLine(const datetime &time[], int rates_total)
   }
 
 //+------------------------------------------------------------------+
-//| Find anchor index from time array                                |
+//| Find anchor index from time array (v1.01 optimized)              |
 //+------------------------------------------------------------------+
 int FindAnchorIndex(const datetime &time[], int rates_total, datetime anchorTime)
   {
    if(anchorTime==0) return(-1);
-   // find bar with time <= anchorTime < next bar? Use iBarShift
-   int shift = iBarShift(_Symbol, _Period, anchorTime, true);
+   int shift = iBarShift(_Symbol, _Period, anchorTime, false);
    if(shift<0) return(-1);
-   // iBarShift returns index from newest? Actually when array is not series, iBarShift still returns shift from 0 = oldest? No, iBarShift uses series indexing where 0 = newest bar. So we need to convert.
-   // Easier: linear search from end for simplicity within MaxBarsBack (5000) - acceptable
-   // Since time[] is 0=oldest, we search for largest time <= anchorTime
-   int idx=-1;
-   for(int i=rates_total-1; i>=0; i--)
-     {
-      if(time[i] <= anchorTime)
-        {
-         idx=i;
-         break;
-        }
-     }
-   // if anchorTime before first bar, use first bar
-   if(idx==-1) idx=0;
+   // iBarShift: 0 = newest bar, convert to 0 = oldest indexing used in time[]
+   int idx = rates_total - 1 - shift;
+   if(idx<0) idx=0;
+   if(idx>=rates_total) idx=rates_total-1;
    return(idx);
   }
 
@@ -336,15 +325,12 @@ int OnInit()
    g_warnedSessionHTF=false;
    g_warnedZeroVol=false;
    g_anchorMoved=false;
-   g_effectiveAnchorTime = InpAnchorTime;
+   // v1.01: keep dragged anchor across TF changes
+   if(InpAnchorTime!=0 || g_effectiveAnchorTime==0)
+      g_effectiveAnchorTime = InpAnchorTime;
    g_lastAnchorTime = InpAnchorTime;
-
-   if(InpResetMode==RESET_ANCHORED)
-     {
-      // create anchor line, will be positioned in OnCalculate when time[] available
-      // placeholder at current time
-      CreateAnchorLine(TimeCurrent());
-     }
+   if(InpResetMode==RESET_ANCHORED && ObjectFind(0, ANCHOR_NAME)<0)
+      CreateAnchorLine(g_effectiveAnchorTime!=0 ? g_effectiveAnchorTime : TimeCurrent());
 
    Print("FXR VWAP initialized: Reset=", EnumToString(InpResetMode), " SessionStart=", InpSessionStart,
          " Price=", EnumToString(InpPriceSource), " Vol=", EnumToString(InpVolumeSource),
@@ -354,11 +340,12 @@ int OnInit()
   }
 
 //+------------------------------------------------------------------+
-//| OnDeinit                                                         |
+//| OnDeinit  v1.01: keep anchor on TF change / param change / recompile |
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason)
   {
-   // Keep anchor line? Spec says if deleted recreate, so on deinit we remove to clean
+   if(reason==REASON_CHARTCHANGE || reason==REASON_PARAMETERS || reason==REASON_RECOMPILE)
+      return; // line stays; EnsureAnchorLine() reads it back on next init
    if(ObjectFind(0, ANCHOR_NAME)>=0)
       ObjectDelete(0, ANCHOR_NAME);
   }
@@ -757,7 +744,8 @@ int OnCalculate(const int rates_total,
                  {
                   g_lastAlertBarTime = time[closedIdx];
                   string dir = crossAbove ? "above" : "below";
-                  string msg = StringFormat("FXR VWAP: %s %s close %s VWAP %.5f", _Symbol, EnumToString(_Period), dir, vwapPrev);
+                  string tf = StringSubstr(EnumToString(_Period), 7);
+                  string msg = StringFormat("FXR VWAP: %s %s close %s VWAP %.5f", _Symbol, tf, dir, vwapPrev);
                   Alert(msg);
                   Print(msg);
                   if(InpAlertPush) SendNotification(msg);
