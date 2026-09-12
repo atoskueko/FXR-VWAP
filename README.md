@@ -119,3 +119,4 @@ v1.01 - 2026-09-12
 v1.00 - 2026-09-11
 - Initial release: Session/Weekly/Monthly/Anchored VWAP with volume-weighted σ bands, price/volume source selection, draggable anchor line, cross alerts, MaxBarsBack cap, zero-volume handling, H4+ session warning
 
+
