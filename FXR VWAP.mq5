@@ -6,7 +6,7 @@
 #property copyright "Copyright 2026, FXrepo.com"
 #property link "https://fxrepo.com/resources/vwap-indicator-mt5/"
 #property description "FXR VWAP — session / weekly / monthly / anchored VWAP with volume-weighted bands. MIT licence."
-#property version   "1.0.1"
+#property version   "1.01"
 
 #property indicator_chart_window
 #property indicator_buffers 5
