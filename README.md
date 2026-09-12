@@ -1,3 +1,5 @@
+<img width="1358" height="643" alt="FXR VWAP-1" src="https://github.com/user-attachments/assets/baefe113-917d-4685-aa33-f95d255dad7a" />
+
 FXR VWAP.mq5 - Installation and Documentation
 ================================================
 
@@ -7,9 +9,6 @@ Closest third-party alternative: TradingView's built-in VWAP (session/anchored w
 
 Post URL: https://fxrepo.com/resources/vwap-indicator-mt5/
 Licence: MIT (see below)
-
-<img width="1358" height="643" alt="FXR VWAP-1" src="https://github.com/user-attachments/assets/baefe113-917d-4685-aa33-f95d255dad7a" />
-
 
 ------------------------------------------------
 INSTALLATION
@@ -85,20 +84,11 @@ CODING NOTES
 Anchor line: OBJ_VLINE named FXR_VWAP_Anchor, OBJPROP_SELECTABLE true; OnChartEvent drag → snap to bar, full recompute
 
 ------------------------------------------------
-Limitations & known issues
-------------------------------------------------
-- Tick volume ≠ traded volume. On forex/CFDs the VWAP is a tick-volume-weighted average; it tracks exchange VWAP closely on liquid pairs but is not the same number. Real volume is used only where the broker publishes it (some futures/stock CFDs).
-- Session reset is in server time; brokers differ (GMT+2/+3 with DST). Set SessionStart per broker.
-- Values differ slightly from TradingView when the TV session boundary differs from your broker's day or when TV uses real volume.
-- Not a signal generator; the cross alert is informational.
-- No MT4 build yet.
-
-------------------------------------------------
 MIT LICENCE
 ------------------------------------------------
 MIT License
 
-Copyright (c) 2026 FXrepo.com (atoskueko); About → website https://fxrepo.com/resources/vwap-indicator-mt5/, topics mql5 metatrader5 vwap indicator.
+Copyright (c) 2026 FXrepo.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -121,5 +111,11 @@ SOFTWARE.
 ------------------------------------------------
 CHANGELOG
 ------------------------------------------------
+v1.01 - 2026-09-12
+- Fix alert text: EnumToString(_Period) -> StringSubstr(EnumToString(_Period),7) now prints M1, H1, D1 instead of PERIOD_M1
+- Fix dragged anchor lost on timeframe change: OnDeinit now keeps line on REASON_CHARTCHANGE / PARAMETERS / RECOMPILE, OnInit preserves g_effectiveAnchorTime across TF changes
+- Optimize FindAnchorIndex(): use rates_total-1-iBarShift(...,false) instead of linear scan
+
 v1.00 - 2026-09-11
 - Initial release: Session/Weekly/Monthly/Anchored VWAP with volume-weighted σ bands, price/volume source selection, draggable anchor line, cross alerts, MaxBarsBack cap, zero-volume handling, H4+ session warning
+
